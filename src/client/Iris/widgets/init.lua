@@ -1,4 +1,4 @@
-local Types = require(script.Parent.Types)
+local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/Types.lua"))() else require(script.Parent.Types)
 
 local widgets = {} :: Types.WidgetUtility
 
@@ -383,16 +383,25 @@ return function(Iris: Types.Iris)
             state.ConnectedWidgets[thisWidget.ID] = nil
         end
     end
-
-    require(script.Root)       (Iris, widgets)
-    require(script.Text)       (Iris, widgets)
-    require(script.Button)     (Iris, widgets)
-    require(script.Format)     (Iris, widgets)
-    require(script.Checkbox)   (Iris, widgets)
-    require(script.RadioButton)(Iris, widgets)
-    require(script.Tree)       (Iris, widgets)
-    require(script.Input)      (Iris, widgets)
-    require(script.Combo)      (Iris, widgets)
-    require(script.Table)      (Iris, widgets)
-    require(script.Window)     (Iris, widgets)
+    
+    if getgenv then
+        local FilesList = cloneref(game:GetService("HttpService")):JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Sigmanic/Iris/contents/src/client/Iris/widgets"))
+        for i,v in next, FilesList do
+            if v.name ~= "init.lua" then
+                loadstring(game:HttpGetAsync(v.download_url))()(Iris, widgets)
+            end
+        end
+    else
+        require(script.Root)       (Iris, widgets)
+        require(script.Text)       (Iris, widgets)
+        require(script.Button)     (Iris, widgets)
+        require(script.Format)     (Iris, widgets)
+        require(script.Checkbox)   (Iris, widgets)
+        require(script.RadioButton)(Iris, widgets)
+        require(script.Tree)       (Iris, widgets)
+        require(script.Input)      (Iris, widgets)
+        require(script.Combo)      (Iris, widgets)
+        require(script.Table)      (Iris, widgets)
+        require(script.Window)     (Iris, widgets)
+    end
 end

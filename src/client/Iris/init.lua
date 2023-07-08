@@ -1,5 +1,5 @@
 --!optimize 2
-local Types = require(script.Types)
+local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/Types.lua"))() else require(script.Types)
 
 --- @class Iris
 --- 
@@ -745,7 +745,7 @@ end
 --- @within Iris
 --- @prop TemplateConfig table
 --- TemplateConfig provides a table of default styles and configurations which you may apply to your UI.
-Iris.TemplateConfig = require(script.config)
+Iris.TemplateConfig = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/config.lua"))() else require(script.config)
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.colorDark) -- use colorDark and sizeDefault themes by default
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.sizeDefault)
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.utilityDefault)
@@ -755,9 +755,13 @@ Iris._globalRefreshRequested = false -- UpdatingGlobalConfig changes this to tru
 --- @function ShowDemoWindow
 --- ShowDemoWindow is a function which creates a Demonstration window. this window contains many useful utilities for coders, and serves as a refrence for using each part of the library.
 --- Ideally, the DemoWindow should always be available in your UI.
-Iris.ShowDemoWindow = require(script.demoWindow)(Iris)
+Iris.ShowDemoWindow = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/demoWindow.lua"))()(Iris) else require(script.demoWindow)(Iris)
 
-require(script.widgets)(Iris)
+if getgenv then 
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/widgets/init.lua"))()(Iris)
+else
+	require(script.widgets)(Iris)
+end
 
 --- @class Widgets
 --- Each widget is available through Iris.<widget name\>

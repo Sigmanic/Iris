@@ -1,4 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
+local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/Types.lua"))() else require(script.Parent.Parent.Types)
 
 return function(Iris: Types.Iris, widgets: Types.WidgetUtility)
     Iris.WidgetConstructor("Checkbox", {

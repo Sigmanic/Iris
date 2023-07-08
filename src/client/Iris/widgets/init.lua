@@ -383,9 +383,9 @@ return function(Iris: Types.Iris)
             state.ConnectedWidgets[thisWidget.ID] = nil
         end
     end
-    
+
     if getgenv then
-        local FilesList = cloneref(game:GetService("HttpService")):JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Sigmanic/Iris/contents/src/client/Iris/widgets"))
+        local FilesList = cloneref(game:GetService("HttpService")):JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Sigmanic/Iris/contents/src/client/Iris/widgets?ref=master"))
         for i,v in next, FilesList do
             if v.name ~= "init.lua" then
                 loadstring(game:HttpGetAsync(v.download_url))()(Iris, widgets)

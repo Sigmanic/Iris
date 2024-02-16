@@ -1,4 +1,4 @@
-local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/master/src/client/Iris/Types.lua"))() else require(script.Parent.Types)
+local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/Types.lua"))() else require(script.Parent.Parent.Types)
 
 local widgets = {} :: Types.WidgetUtility
 
@@ -515,7 +515,7 @@ return function(Iris: Types.Internal)
     Iris._utility = widgets
 
     if getgenv then
-        local FilesList = cloneref(game:GetService("HttpService")):JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Sigmanic/Iris/contents/src/client/Iris/widgets?ref=main"))
+        local FilesList = cloneref(game:GetService("HttpService")):JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Sigmanic/Iris/contents/lib/widgets?ref=main"))
         for i,v in next, FilesList do
             if v.name ~= "init.lua" then
                 loadstring(game:HttpGetAsync(v.download_url))()(Iris, widgets)

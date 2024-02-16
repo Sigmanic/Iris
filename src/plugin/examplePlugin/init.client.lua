@@ -1,5 +1,5 @@
-local Iris = require(script.Parent.Iris)
-local Input = require(script.UserInputService)
+local Iris = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/init.lua"))() else require(script.Parent.Iris)
+local Input = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/src/plugin/examplePlugin/UserInputService.lua"))() else require(script.UserInputService)
 
 -- Create the plugin toolbar, button and dockwidget for Iris to work in.
 local widgetInfo: DockWidgetPluginGuiInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, false, false, 200, 300)

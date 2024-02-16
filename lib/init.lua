@@ -9,7 +9,7 @@ local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercon
 ]=]
 local Iris = {} :: Types.Iris
 
-local Internal: Types.Internal = require(script.Internal)(Iris)
+local Internal: Types.Internal = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/Internal.lua"))()(Iris) else require(script.Internal)(Iris)
 
 --[=[
     @prop Disabled boolean
@@ -267,7 +267,7 @@ end
 
     TemplateConfig provides a table of default styles and configurations which you may apply to your UI.
 ]=]
-Iris.TemplateConfig = require(script.config)
+Iris.TemplateConfig = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/Types.lua"))() else require(script.config)
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.colorDark) -- use colorDark and sizeDefault themes by default
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.sizeDefault)
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.utilityDefault)
@@ -449,9 +449,14 @@ end
     Iris:Connect(Iris.ShowDemoWindow)
     ```
 ]=]
-Iris.ShowDemoWindow = require(script.demoWindow)(Iris)
+Iris.ShowDemoWindow = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/demoWindow.lua"))()(Iris) else require(script.demoWindow)(Iris)
 
-require(script.widgets)(Internal)
-require(script.API)(Iris)
+if getgenv then 
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/widgets/init.lua"))()(Internal)
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/API.lua"))()(Iris)
+else
+    require(script.widgets)(Internal)
+    require(script.API)(Iris)
+end
 
 return Iris

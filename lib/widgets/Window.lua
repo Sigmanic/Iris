@@ -151,7 +151,8 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             if windowWidgets[focusedWindow.ID] then
                 local Window = focusedWindow.Instance :: Frame
                 local WindowButton = Window.WindowButton :: TextButton
-                local TitleBar: Frame = WindowButton.TitleBar
+                local Content = WindowButton.Content :: Frame
+                local TitleBar: Frame = Content.TitleBar
                 -- update appearance to unfocus
                 if focusedWindow.state.isUncollapsed.value then
                     TitleBar.BackgroundColor3 = Iris._config.TitleBgColor
@@ -173,7 +174,8 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             focusedWindow = thisWidget
             local Window = thisWidget.Instance :: Frame
             local WindowButton = Window.WindowButton :: TextButton
-            local TitleBar: Frame = WindowButton.TitleBar
+            local Content = WindowButton.Content :: Frame
+            local TitleBar: Frame = Content.TitleBar
 
             TitleBar.BackgroundColor3 = Iris._config.TitleBgActiveColor
             TitleBar.BackgroundTransparency = Iris._config.TitleBgActiveTransparency
@@ -207,10 +209,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             local inWindow: boolean = false
-            local position: Vector2 = widgets.UserInputService:GetMouseLocation()
+            local position: Vector2 = widgets.getMouseLocation()
             for _, window in windowWidgets do
-                local WindowButton: TextButton = window.Instance and window.Instance.WindowButton
-                if WindowButton and widgets.isPosInsideRect(position, WindowButton.AbsolutePosition, WindowButton.AbsolutePosition + WindowButton.AbsoluteSize) then
+                local ResizeBorder: TextButton = window.Instance and window.Instance.WindowButton.ResizeBorder
+                if ResizeBorder and widgets.isPosInsideRect(position, ResizeBorder.AbsolutePosition, ResizeBorder.AbsolutePosition + ResizeBorder.AbsoluteSize) then
                     inWindow = true
                     break
                 end
@@ -431,10 +433,22 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end)
 
-            -- local FlexContainer:  = Instance.new("")
+            local Content: Frame = Instance.new("Frame")
+            Content.Name = "Content"
+            Content.AnchorPoint = Vector2.new(0.5, 0.5)
+            Content.Position = UDim2.fromScale(0.5, 0.5)
+            Content.Size = UDim2.fromScale(1, 1)
+            Content.BackgroundTransparency = 1
+            Content.ClipsDescendants = true
+            Content.Parent = WindowButton
+
+            local UIListLayout: UIListLayout = widgets.UIListLayout(Content, Enum.FillDirection.Vertical, UDim.new(0, 0))
+            UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
 
             local ChildContainer: ScrollingFrame = Instance.new("ScrollingFrame")
             ChildContainer.Name = "ChildContainer"
+            ChildContainer.AutomaticSize = Enum.AutomaticSize.None
             ChildContainer.Size = UDim2.fromScale(1, 1)
             ChildContainer.Position = UDim2.fromOffset(0, 0)
             ChildContainer.BackgroundColor3 = Iris._config.WindowBgColor
@@ -444,7 +458,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ChildContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
             ChildContainer.ScrollBarImageTransparency = Iris._config.ScrollbarGrabTransparency
             ChildContainer.ScrollBarImageColor3 = Iris._config.ScrollbarGrabColor
-            ChildContainer.CanvasSize = UDim2.fromScale(0, 1)
+            ChildContainer.CanvasSize = UDim2.fromScale(0, 0)
             ChildContainer.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
 
             ChildContainer.ZIndex = thisWidget.ZIndex + 3
@@ -453,7 +467,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             widgets.UIPadding(ChildContainer, Iris._config.WindowPadding)
 
-            ChildContainer.Parent = WindowButton
+            ChildContainer.Parent = Content
+
+            local UIFlexItem: UIFlexItem = Instance.new("UIFlexItem")
+            UIFlexItem.FlexMode = Enum.UIFlexMode.Fill
+            UIFlexItem.ItemLineAlignment = Enum.ItemLineAlignment.End
+            UIFlexItem.Parent = ChildContainer
 
             ChildContainer:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
                 -- "wrong" use of state here, for optimization
@@ -490,7 +509,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             TitleBar.LayoutOrder = thisWidget.ZIndex + 1
             TitleBar.ClipsDescendants = true
 
-            TitleBar.Parent = WindowButton
+            TitleBar.Parent = Content
 
             widgets.applyInputBegan(thisWidget, TitleBar, function(input: InputObject)
                 if input.UserInputType == Enum.UserInputType.Touch then
@@ -694,14 +713,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         Update = function(thisWidget: Types.Widget)
             local WindowGui = thisWidget.Instance :: GuiObject
             local WindowButton = WindowGui.WindowButton :: TextButton
-            local TitleBar = WindowButton.TitleBar :: Frame
+            local Content = WindowButton.Content :: Frame
+            local TitleBar = Content.TitleBar :: Frame
             local Title: TextLabel = TitleBar.Title
-            local MenuBar: Frame? = WindowButton:FindFirstChild("MenuBar")
-            local ChildContainer: ScrollingFrame = WindowButton.ChildContainer
+            local MenuBar: Frame? = Content:FindFirstChild("MenuBar")
+            local ChildContainer: ScrollingFrame = Content.ChildContainer
             local ResizeGrip: TextButton = WindowButton.ResizeGrip
-
-            local containerHeight: number = 0
-            local menuHeight: number = 0
 
             if thisWidget.arguments.NoResize ~= true then
                 ResizeGrip.Visible = true
@@ -717,20 +734,13 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 TitleBar.Visible = false
             else
                 TitleBar.Visible = true
-                --local titlebarSize: number = widgets.calculateTextSize(thisWidget.arguments.Title or "").Y + 2 * Iris._config.FramePadding.Y
-                local titlebarSize: number = TitleBar.AbsoluteSize.Y
-                containerHeight += titlebarSize
-                menuHeight += titlebarSize
             end
             if MenuBar then
                 if thisWidget.arguments.NoMenu then
                     MenuBar.Visible = false
                 else
                     MenuBar.Visible = true
-                    containerHeight += MenuBar.AbsoluteSize.Y
                 end
-                -- we move the menu bar to the correct position.
-                MenuBar.Position = UDim2.fromOffset(0, menuHeight)
             end
             if thisWidget.arguments.NoBackground then
                 ChildContainer.BackgroundTransparency = 1
@@ -755,10 +765,6 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 TitleBar.Title.UIPadding.PaddingRight = UDim.new(0, TitleButtonPaddingSize)
             end
 
-            ChildContainer.Size = UDim2.new(1, 0, 1, -containerHeight)
-            ChildContainer.CanvasSize = UDim2.new(0, 0, 1, -containerHeight)
-            ChildContainer.Position = UDim2.fromOffset(0, containerHeight)
-
             Title.Text = thisWidget.arguments.Title or ""
         end,
         Discard = function(thisWidget: Types.Widget)
@@ -781,10 +787,14 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         ChildAdded = function(thisWidget: Types.Widget, thisChid: Types.Widget)
             local Window = thisWidget.Instance :: Frame
             local WindowButton = Window.WindowButton :: TextButton
+            local Content = WindowButton.Content :: Frame
             if thisChid.type == "MenuBar" then
-                return WindowButton
+                local ChildContainer: ScrollingFrame = Content.ChildContainer
+                thisChid.Instance.ZIndex = ChildContainer.ZIndex - 1
+                thisChid.Instance.LayoutOrder = ChildContainer.LayoutOrder - 1
+                return Content
             end
-            return WindowButton.ChildContainer
+            return Content.ChildContainer
         end,
         UpdateState = function(thisWidget: Types.Widget)
             local stateSize: Vector2 = thisWidget.state.size.value
@@ -795,9 +805,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             local Window = thisWidget.Instance :: Frame
             local WindowButton = Window.WindowButton :: TextButton
-            local TitleBar = WindowButton.TitleBar :: Frame
-            local MenuBar: Frame? = WindowButton:FindFirstChild("MenuBar")
-            local ChildContainer: ScrollingFrame = WindowButton.ChildContainer
+            local Content = WindowButton.Content :: Frame
+            local TitleBar = Content.TitleBar :: Frame
+            local MenuBar: Frame? = Content:FindFirstChild("MenuBar")
+            local ChildContainer: ScrollingFrame = Content.ChildContainer
             local ResizeGrip: TextButton = WindowButton.ResizeGrip
 
             WindowButton.Size = UDim2.fromOffset(stateSize.X, stateSize.Y)

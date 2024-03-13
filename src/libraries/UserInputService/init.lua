@@ -1,4 +1,4 @@
-local Signal = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/src/plugin/examplePlugin/Signal.lua"))() else require(script.Parent.Signal)
+local Signal = require(script.Signal)
 
 local UserInputService: UserInputService = game:GetService("UserInputService")
 

@@ -1,5 +1,7 @@
 local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/Types.lua"))() else require(script.Parent.Parent.Types)
 
+-- Tables need an overhaul.
+
 return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     local tableWidgets: { [Types.ID]: Types.Widget } = {}
 

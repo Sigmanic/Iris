@@ -10,11 +10,24 @@ return function(parent: GuiObject)
     Iris.UpdateGlobalConfig({
         UseScreenGUIs = false,
     })
+    --[[_G.t = {
+        [1] = "1",
+        [2] = "2",
+        [3] = "3",
+    }]]
 
     Iris.Init(parent)
 
     -- Actual Iris code here:
     Iris:Connect(Iris.ShowDemoWindow)
+    --[[Iris:Connect(function()
+        Iris.Window({`Strategies X - {#shared.t}`})
+            Iris.Text({"Version: 0.3.7"})
+            for i,v in next, shared.t do
+                Iris.Text({v})
+            end
+        Iris.End()
+    end)]]
 
     return function()
         Iris.Shutdown()

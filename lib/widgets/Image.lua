@@ -1,4 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
+local Types = if getgenv then loadstring(game:HttpGet("https://raw.githubusercontent.com/Sigmanic/Iris/main/lib/Types.lua"))() else require(script.Parent.Parent.Types)
 
 return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     local abstractImage = {
